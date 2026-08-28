@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat SmartPaper AR Audit Trail - Dashboard</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-logo">GP</div>
+      <div class="brand-text">Panchayat <span>SmartPaper AR</span></div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link active">Design Portal</a>
+      <a href="registrar_scanner.html" class="nav-link">Deed Registration (Ingestion)</a>
+      <a href="inspector_hud.html" class="nav-link">Officer Verification (AR HUD)</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero glass-panel">
+      <div class="badge badge-teal">Panchayat Digital Record Integrity</div>
+      <h1 style="font-family:'Playfair Display', serif; margin-top: 0.5rem;">Panchayat Land Mutation Security System</h1>
+      <p style="font-size:0.95rem;">
+        Preventing unauthorized land record tampering at the village level. By scanning handwritten non-judicial stamp papers (Mutation Registers), 
+        generating secure ledger hashes, and deploying thermal security seals, any physical ink alterations are projected instantly in red 3D space by Block Development Officers (BDOs).
+      </p>
+      <div style="display:flex; flex-wrap:wrap; gap:1rem; margin-top:1.25rem;">
+        <a href="registrar_scanner.html" class="btn btn-primary">Start Ingestion Flow</a>
+        <a href="inspector_hud.html" class="btn btn-secondary">Enter AR Audit HUD</a>
+        <button id="btn-reset" class="btn btn-secondary" style="border-color: rgba(195, 15, 48, 0.4); color: var(--color-crimson);">Reset System State</button>
+      </div>
+    </section>
+
+    <!-- Operational Flow Map -->
+    <h2 style="margin-top: 3rem; font-family:'Playfair Display', serif; font-weight: 700; letter-spacing: -0.5px;">Document Security Operational Flow</h2>
+    <div class="flow-map-container">
+      
+      <a href="registrar_scanner.html" class="flow-card">
+        <span class="flow-card-num">01</span>
+        <div class="flow-card-icon">📷</div>
+        <h3 style="font-weight:600; font-size:1rem; font-family:'Playfair Display', serif;">1. Document Alignment</h3>
+        <p style="font-size:0.8rem; color:var(--color-text-secondary);">
+          Secretary aligns physical stamp paper copy. The CV edge detector corrects angle offsets.
+        </p>
+        <span style="font-size:0.75rem; color:var(--color-gold); font-weight:600;">Go to Scanner &rarr;</span>
+      </a>
+
+      <a href="registrar_scanner.html" class="flow-card">
+        <span class="flow-card-num">02</span>
+        <div class="flow-card-icon">⚡</div>
+        <h3 style="font-weight:600; font-size:1rem; font-family:'Playfair Display', serif;">2. Feature Extraction</h3>
+        <p style="font-size:0.8rem; color:var(--color-text-secondary);">
+          OCR extracts handwritten land values (Hectares, names) and calculates the hash signature.
+        </p>
+        <span style="font-size:0.75rem; color:var(--color-gold); font-weight:600;">View Extraction &rarr;</span>
+      </a>
+
+      <a href="registrar_scanner.html" class="flow-card">
+        <span class="flow-card-num">03</span>
+        <div class="flow-card-icon">🖨️</div>
+        <h3 style="font-weight:600; font-size:1rem; font-family:'Playfair Display', serif;">3. Security Sticker</h3>
+        <p style="font-size:0.8rem; color:var(--color-text-secondary);">
+          Common Service Center (CSC) spools the security QR code sticker to be attached to the paper sheet.
+        </p>
+        <span style="font-size:0.75rem; color:var(--color-gold); font-weight:600;">View Print Queue &rarr;</span>
+      </a>
+
+      <a href="inspector_hud.html" class="flow-card warning-style">
+        <span class="flow-card-num">04</span>
+        <div class="flow-card-icon">🕶️</div>
+        <h3 style="font-weight:600; font-size:1rem; font-family:'Playfair Display', serif;">4. Lal Dora AR Audit</h3>
+        <p style="font-size:0.8rem; color:var(--color-text-secondary);">
+          Inspector overlays AR HUD view. Compares physical details to ledger. Highlights fraud ink in red.
+        </p>
+        <span style="font-size:0.75rem; color:var(--color-crimson); font-weight:600;">Open AR HUD &rarr;</span>
+      </a>
+      
+    </div>
+
+    <!-- Design System Section -->
+    <h2 style="margin-top: 4rem; margin-bottom:1.5rem; font-family:'Playfair Display', serif; font-weight: 700; letter-spacing: -0.5px;">Document Design Tokens</h2>
+    
+    <div class="grid-2" style="margin-bottom: 3rem;">
+      
+      <!-- Typography & Colors -->
+      <div class="card glass-panel">
+        <div class="card-title"><span class="text-teal">■</span> Earthy Color Palette</div>
+        
+        <div>
+          <h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-secondary); margin-bottom:0.75rem;">Color Palette</h4>
+          <div class="token-grid">
+            <div>
+              <div class="token-swatch" style="background: var(--color-bg); border: 1px solid var(--color-border);">#140D0B</div>
+              <div style="font-size:0.75rem; margin-top:0.25rem; font-weight:600;">Earthy Charcoal (Bg)</div>
+            </div>
+            <div>
+              <div class="token-swatch" style="background: var(--color-terracotta);">#B05A3E</div>
+              <div style="font-size:0.75rem; margin-top:0.25rem; font-weight:600;">Clay Terracotta (Prim)</div>
+            </div>
+            <div>
+              <div class="token-swatch" style="background: var(--color-gold); color:#150e0c;">#D4A373</div>
+              <div style="font-size:0.75rem; margin-top:0.25rem; font-weight:600;">Mustard Gold (Acc)</div>
+            </div>
+            <div>
+              <div class="token-swatch" style="background: var(--color-crimson);">#C30F30</div>
+              <div style="font-size:0.75rem; margin-top:0.25rem; font-weight:600;">Kumkum Crimson</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="margin-top: 1rem;">
+          <h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-secondary); margin-bottom:0.75rem;">Typography Scale</h4>
+          <div class="font-spec">
+            <span class="font-spec-name">Playfair.Stamp</span>
+            <span class="font-spec-sample" style="font-family:'Playfair Display', serif; font-size: 2.2rem; font-weight: 800; color:var(--color-text-primary);">Deed Heading (32px)</span>
+          </div>
+          <div class="font-spec">
+            <span class="font-spec-name">Rozha.Crest</span>
+            <span class="font-spec-sample" style="font-family:'Rozha One', serif; font-size: 1.5rem; color:var(--color-gold);">Gram Panchayat (24px)</span>
+          </div>
+          <div class="font-spec">
+            <span class="font-spec-name">body.regional</span>
+            <span class="font-spec-sample" style="font-size: 0.95rem; font-weight: 400; color: var(--color-text-primary);">Earthy Sans Text (15px)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Component Playground -->
+      <div class="card glass-panel">
+        <div class="card-title"><span class="text-teal">⚙️</span> Component Library</div>
+        
+        <div>
+          <h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-secondary); margin-bottom:0.75rem;">Button Hierarchy</h4>
+          <div style="display:flex; flex-wrap:wrap; gap:0.75rem;">
+            <button class="btn btn-primary">Primary Terracotta</button>
+            <button class="btn btn-secondary">Secondary Rustic</button>
+            <button class="btn btn-danger">Sindoor Red Danger</button>
+            <button class="btn btn-primary" disabled>Disabled State</button>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-secondary); margin-bottom:0.75rem;">Verification Badges</h4>
+          <div style="display:flex; flex-wrap:wrap; gap:0.75rem; align-items:center;">
+            <span class="badge badge-teal"><span class="status-dot active"></span>Verified Original</span>
+            <span class="badge badge-crimson"><span class="status-dot danger"></span>Alteration Detected</span>
+          </div>
+        </div>
+
+        <div>
+          <h4 style="font-size:0.8rem; text-transform:uppercase; color:var(--color-text-secondary); margin-bottom:0.75rem;">Active Parser Terminal</h4>
+          <div id="demo-terminal" class="hash-terminal" style="height: 100px;"></div>
+        </div>
+      </div>
+      
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      writeToTerminal("demo-terminal", "Panchayat Server connected successfully.", "info");
+      writeToTerminal("demo-terminal", "Security tokens loaded: Earthy Clay configuration activated.", "success");
+      writeToTerminal("demo-terminal", "Deed Mutation Ledger system online.", "info");
+
+      const resetBtn = document.getElementById("btn-reset");
+      resetBtn.addEventListener("click", () => {
+        resetSystemState();
+        writeToTerminal("demo-terminal", "Local registry database state has been wiped.", "warning");
+        alert("Panchayat system state reset to original defaults.");
+      });
+    });
+  </script>
+</body>
+</html>

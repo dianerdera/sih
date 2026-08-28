@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat SmartPaper AR Audit Trail - CSC Sticker Print</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    .sticker-details {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.5rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.6rem;
+      color: #3e2723;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-logo">GP</div>
+      <div class="brand-text">Panchayat <span>SmartPaper AR</span></div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Panchayat Portal</a>
+      <a href="registrar_scanner.html" class="nav-link active">Security Ingestion Flow</a>
+      <a href="inspector_hud.html" class="nav-link">AR Audit Flow</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Step Progression Tracker -->
+    <div class="step-indicator">
+      <div class="step-bubble completed">1</div>
+      <div style="font-size:0.85rem; font-weight:500; color:var(--color-text-secondary);">Document Alignment</div>
+      <div class="step-connector completed"></div>
+      
+      <div class="step-bubble completed">2</div>
+      <div style="font-size:0.85rem; font-weight:500; color:var(--color-text-secondary);">Feature Extraction</div>
+      <div class="step-connector completed"></div>
+      
+      <div class="step-bubble active">3</div>
+      <div style="font-size:0.85rem; font-weight:600; color:var(--color-gold);">Security Sticker</div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Printer queue drawer -->
+      <div class="card glass-panel printer-queue-card">
+        <div class="card-title" style="align-self:flex-start;">
+          <span class="text-teal">🖨️</span> 
+          <span>Common Service Center (CSC) Printer Pool</span>
+        </div>
+
+        <div class="printer-graphic-container">
+          <svg class="printer-body-svg" viewBox="0 0 100 80" xmlns="http://www.w3.org/2000/svg">
+            <path d="M10,20 L90,20 L85,10 L15,10 Z" fill="#372620"/>
+            <rect x="5" y="20" width="90" height="50" rx="4" fill="#1c1310" stroke="var(--color-border)" stroke-width="2"/>
+            <rect x="15" y="38" width="70" height="4" rx="2" fill="#0d0806"/>
+            <line x1="5" y1="45" x2="95" y2="45" stroke="var(--color-border)" stroke-width="1"/>
+            <circle cx="85" cy="58" r="2" fill="var(--color-gold)" id="printer-led"/>
+          </svg>
+
+          <!-- Printed sticker element that slides out (Stamp theme style) -->
+          <div class="printed-sticker" id="print-output" style="opacity: 0; background:#f4efe2; border-color:#a1887f;">
+            <div class="sticker-details">
+              <div id="sticker-qr-svg" style="width:36px; height:36px;"></div>
+              <div style="font-weight:800; font-size:0.45rem; color:#a23b20; border-top:1px solid rgba(162, 59, 32, 0.2); width:100%; padding-top:2px;">SECURITY SEAL</div>
+              <div id="sticker-hash-lbl" style="font-size:0.4rem; color:#5d4037; font-weight:700;">-------</div>
+            </div>
+          </div>
+        </div>
+
+        <div style="text-align:center;">
+          <p id="printer-state-msg" style="font-size:0.9rem; color:var(--color-text-secondary);">
+            Printer Status: <strong>Ready to print 1 Security Seal</strong>
+          </p>
+        </div>
+      </div>
+
+      <!-- Action Panel & Spec Notes -->
+      <div class="card glass-panel" style="justify-content: space-between;">
+        <div>
+          <div class="card-title">
+            <span class="text-teal">🎫</span> 
+            <span>Sticker Registration & Pairing</span>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="metadata-list">
+              <div class="metadata-item">
+                <span class="metadata-label">Print Service</span>
+                <span class="metadata-value">CSC-PANCHAYAT-LEVEL4</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-label">Printer Port</span>
+                <span class="metadata-value">USB01 Zebra Thermal</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-label">Active Connection</span>
+                <span class="metadata-value" style="color:var(--color-gold);">Online</span>
+              </div>
+            </div>
+
+            <button id="btn-print" class="btn btn-primary" style="padding: 1rem; width:100%; font-size:1.05rem;">
+              Print Security Seal
+            </button>
+
+            <div style="border-top: 1px solid var(--color-border); padding-top: 1.25rem; display:flex; flex-direction:column; gap:0.75rem;">
+              <div style="display:flex; align-items:flex-start; gap:0.75rem;">
+                <input type="checkbox" id="chk-verify" disabled style="margin-top: 0.25rem; width:18px; height:18px; cursor:pointer;">
+                <label for="chk-verify" style="text-transform:none; color:var(--color-text-primary); font-size:0.85rem; cursor:pointer;">
+                  I have physically attached the printed Micro-QR sticker to the bottom-right corner of land mutation register <strong>GP-KHATA-88092-B</strong>.
+                </label>
+              </div>
+
+              <button id="btn-complete" class="btn btn-secondary" disabled style="padding: 0.9rem; width:100%;">
+                Save & Register Deed
+              </button>
+            </div>
+          </div>
+          
+          <div style="margin-top: 1.5rem;">
+            <div class="blueprint-note">
+              <strong>Deed Registration Rule:</strong>
+              <p style="font-size:0.75rem; margin-top:0.25rem; line-height:1.4;">
+                Once printed and attached to the physical stamp, the signature hash is synchronized to the district land registry database. Any offline ink changes will be detected instantly during BDO inspections.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-container">
+          <div class="console-title">🖥️ CSC Print Server Console</div>
+          <div id="print-terminal" class="hash-terminal"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const state = getSystemState();
+      
+      const termId = "print-terminal";
+      writeToTerminal(termId, "Print server spooler client connected.", "info");
+      writeToTerminal(termId, `Current spooled job: 1 item. Target: ${state.docId}`, "info");
+      
+      const qrTarget = document.getElementById("sticker-qr-svg");
+      const hashVal = state.hashGenerated || "e47ac5f6d63428d09ca081df32c918bb619ca24838634120ec2c2f6d45bbdc9a";
+      qrTarget.innerHTML = SVG_TEMPLATES.qrCode(hashVal);
+      document.getElementById("sticker-hash-lbl").textContent = hashVal.substring(0, 10).toUpperCase();
+
+      const printBtn = document.getElementById("btn-print");
+      const completeBtn = document.getElementById("btn-complete");
+      const chkVerify = document.getElementById("chk-verify");
+      const sticker = document.getElementById("print-output");
+      const led = document.getElementById("printer-led");
+      const stateMsg = document.getElementById("printer-state-msg");
+
+      printBtn.addEventListener("click", () => {
+        printBtn.disabled = true;
+        
+        writeToTerminal(termId, "Generating ZPL II raster strings...", "info");
+        writeToTerminal(termId, "Uploading sticker buffers to USB port...", "info");
+        
+        setTimeout(() => {
+          writeToTerminal(termId, "Printer check: Thermal ribbon check successful.", "info");
+          writeToTerminal(termId, "Spooling security seal adhesive media...", "info");
+          
+          led.setAttribute("fill", "var(--color-gold)");
+          sticker.style.opacity = "1";
+          sticker.classList.add("printing");
+        }, 800);
+
+        setTimeout(() => {
+          led.setAttribute("fill", "var(--color-green)");
+          stateMsg.innerHTML = "Security sticker successfully printed. <strong>Awaiting attachment check...</strong>";
+          writeToTerminal(termId, "Print complete. Media cutter engaged.", "success");
+          
+          chkVerify.disabled = false;
+        }, 2800);
+      });
+
+      chkVerify.addEventListener("change", (e) => {
+        if (e.target.checked) {
+          completeBtn.disabled = false;
+          completeBtn.className = "btn btn-primary";
+          writeToTerminal(termId, "Attachment confirmation checked. Ready to complete.", "info");
+        } else {
+          completeBtn.disabled = true;
+          completeBtn.className = "btn btn-secondary";
+        }
+      });
+
+      completeBtn.addEventListener("click", () => {
+        updateSystemState({ qrPrinted: true });
+        alert("Land Mutation document GP-KHATA-88092-B successfully registered in the secure Panchayat database!");
+        window.location.href = "index.html";
+      });
+    });
+  </script>
+</body>
+</html>

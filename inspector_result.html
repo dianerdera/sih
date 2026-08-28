@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat SmartPaper AR Audit Trail - Scan Result</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Bounding box position specifically aligned with handwriting block coordinates */
+    .target-tamper-box {
+      top: 135px;
+      left: 40px;
+      width: 215px;
+      height: 26px;
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-logo">GP</div>
+      <div class="brand-text">Panchayat <span>SmartPaper AR</span></div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Panchayat Portal</a>
+      <a href="registrar_scanner.html" class="nav-link">Security Ingestion Flow</a>
+      <a href="inspector_hud.html" class="nav-link">AR Audit Flow</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="grid-2">
+      <!-- Live Camera Stream with AR Overlays -->
+      <div class="card glass-panel" style="padding: 1rem;">
+        <div class="card-title" style="justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="status-dot active" id="camera-led"></span> 
+            <span>AR ACTIVE PROJECTION HUD</span>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color:var(--color-text-secondary);">SPATIAL OVERLAY ACTIVE</span>
+        </div>
+
+        <div class="viewport-container" id="camera-viewport" style="background:#0c0908;">
+          
+          <div class="scanner-crop-corners scanning" id="crop-brackets">
+            <div class="scanner-crop-corners-inner"></div>
+          </div>
+
+          <!-- AR Bounding Highlights (Kumkum Red over tampered land values) -->
+          <div class="ar-bounding-box target-tamper-box" id="ar-highlight-box"></div>
+          
+          <!-- AR Tag Labels floating next to the alteration -->
+          <div class="ar-tag ar-tag-crimson" id="ar-tag-label" style="top: 100px; left: 40px; display: none;">
+            <span class="status-dot danger"></span>
+            <span>ILLEGITIMATE INK DETECTED [162px mismatch]</span>
+          </div>
+
+          <!-- AR Tag Label for verified state -->
+          <div class="ar-tag ar-tag-teal" id="ar-tag-verified" style="top: 135px; left: 40px; display: none;">
+            <span class="status-dot active"></span>
+            <span>VERIFIED ORIGINAL [0px mismatch]</span>
+          </div>
+
+          <!-- Spatial locking anchor targets -->
+          <div class="ar-anchor-dot" style="top: 10%; left: 15%; display:none;" id="anchor-1"></div>
+          <div class="ar-anchor-dot" style="top: 10%; right: 15%; display:none;" id="anchor-2"></div>
+          <div class="ar-anchor-dot" style="top: 90%; left: 15%; display:none;" id="anchor-3"></div>
+          <div class="ar-anchor-dot" style="top: 90%; right: 15%; display:none;" id="anchor-4"></div>
+
+          <!-- Stamp paper document mockup -->
+          <div class="document-mockup stamp-paper" style="transform: translate(-50%, -50%) scale(0.95);" id="paper-doc">
+            <div class="stamp-header-band" style="margin-bottom:0.25rem;">भारत गैर न्यायिक // INDIAN NON JUDICIAL</div>
+            <div class="stamp-crest" style="font-size:1rem; margin-bottom:0.4rem;">GOVT. OF UTTAR PRADESH</div>
+            <div class="doc-watermark">LAND DEED</div>
+            <div class="doc-header" style="border-bottom: 1px solid #8d6e63; padding-bottom:0.25rem;">
+              <span class="doc-title" id="doc-title-placeholder" style="font-size:0.6rem; color:#3e2723;">LAND MUTATION REGISTER</span>
+              <span class="doc-meta" id="doc-meta-placeholder" style="font-size:0.5rem; color:#5d4037;">GP-KHATA-88092-B<br>2026-08-28</span>
+            </div>
+            <div class="doc-body" style="gap:0.4rem; margin-top:0.4rem;">
+              <div class="doc-line medium" style="background:#d7ccc8;"></div>
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+              
+              <!-- Handwriting amount block -->
+              <div class="doc-handwriting" id="handwriting-placeholder" style="font-size:0.75rem; color:#1a237e;">
+                Allotted Area: 1.20 Hectares to Rajesh Kumar
+              </div>
+              
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+            </div>
+            <div class="doc-footer" style="border-top:1px solid #d7ccc8; padding-top:0.25rem;">
+              <div class="doc-signature" id="signature-placeholder"></div>
+              <div class="doc-qr-placeholder attached" id="qr-placeholder"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel / Control Dashboard -->
+      <div class="card glass-panel" style="justify-content: space-between;">
+        
+        <!-- Condition 1: VERIFIED AUTHENTIC -->
+        <div id="panel-verified" style="display:none; flex-direction:column; gap:1.25rem;">
+          <div>
+            <div class="badge badge-teal" style="font-size:0.8rem; padding:0.4rem 0.8rem; margin-bottom:0.75rem;">
+              <span class="status-dot active"></span> Cryptographic Match Confirmed
+            </div>
+            <h2 style="font-weight:800; font-size:1.55rem; letter-spacing:-0.5px; font-family:'Playfair Display', serif;">Deed Verified Authentic</h2>
+            <p style="color:var(--color-text-secondary); font-size:0.9rem; margin-top:0.25rem;">
+              The physical stamp record matches the district ledger's signature. 
+              No unauthorized modifications identified. Land area mutation verified.
+            </p>
+          </div>
+
+          <div class="metadata-list">
+            <div class="metadata-item">
+              <span class="metadata-label">Doc ID</span>
+              <span class="metadata-value">GP-KHATA-88092-B</span>
+            </div>
+            <div class="metadata-item">
+              <span class="metadata-label">Ledger Hash</span>
+              <span class="metadata-value" id="lbl-verified-hash" style="color:var(--color-gold);">e47ac5f6d63428d09ca0...</span>
+            </div>
+            <div class="metadata-item">
+              <span class="metadata-label">Verification Time</span>
+              <span class="metadata-value" id="lbl-verified-time">2026-08-28 23:24:10</span>
+            </div>
+            <div class="metadata-item">
+              <span class="metadata-label">Delta Pixels</span>
+              <span class="metadata-value" style="color:var(--color-green);">0 px (0.0% variance)</span>
+            </div>
+          </div>
+
+          <div style="display:flex; gap:0.75rem;">
+            <a href="inspector_hud.html" class="btn btn-primary" style="flex:1;">Scan Next Document</a>
+            <a href="index.html" class="btn btn-secondary">Exit HUD</a>
+          </div>
+        </div>
+
+        <!-- Condition 2: TAMPER DETECTED -->
+        <div id="panel-tampered" style="display:none; flex-direction:column; gap:1.25rem;">
+          <div>
+            <div class="badge badge-crimson" style="font-size:0.8rem; padding:0.4rem 0.8rem; margin-bottom:0.75rem;">
+              <span class="status-dot danger"></span> Tampering Detected
+            </div>
+            <h2 style="font-weight:800; font-size:1.55rem; letter-spacing:-0.5px; font-family:'Playfair Display', serif;" class="text-crimson">Physical Alteration Flagged!</h2>
+            <p style="color:var(--color-text-secondary); font-size:0.9rem; margin-top:0.25rem;">
+              A physical ink mismatch was detected. The handwriting values of Rajesh Kumar's land mutation record differ from the original registered stamp parameters.
+            </p>
+          </div>
+
+          <div class="metadata-list">
+            <div class="metadata-item">
+              <span class="metadata-label">Doc ID</span>
+              <span class="metadata-value">GP-KHATA-88092-B</span>
+            </div>
+            <div class="metadata-item">
+              <span class="metadata-label">Tamper Area</span>
+              <span class="metadata-value" style="color:var(--color-crimson);">Handwriting Grid [X:45, Y:140]</span>
+            </div>
+            <div class="metadata-item">
+              <span class="metadata-label">Variance Score</span>
+              <span class="metadata-value" style="color:var(--color-crimson);">162 px Delta (Forgery Flagged)</span>
+            </div>
+          </div>
+
+          <div style="display:flex; flex-direction:column; gap:0.75rem;">
+            <button id="btn-show-delta" class="btn btn-primary" style="width:100%; padding:0.9rem; background: var(--color-crimson); box-shadow: var(--shadow-crimson);">
+              🔍 View Pixel Delta Drawer
+            </button>
+            <div style="display:flex; gap:0.75rem;">
+              <button id="btn-report-incident" class="btn btn-secondary" style="flex:1;">Log Forgery Report</button>
+              <a href="inspector_hud.html" class="btn btn-secondary">Scan Again</a>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-container">
+          <div class="console-title">🖥️ Verification Core Logs</div>
+          <div id="result-terminal" class="hash-terminal" style="height:120px;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pixel Delta Analyzer Drawer (Stamp background) -->
+    <div class="drawer" id="delta-drawer">
+      <div class="drawer-header">
+        <span class="drawer-title text-crimson">Pixel Delta Comparator</span>
+        <button class="drawer-close" id="btn-close-delta">&times;</button>
+      </div>
+      <div class="drawer-body" style="background:#1d1411; color:var(--color-text-primary);">
+        <p style="font-size:0.85rem; color:var(--color-text-secondary); margin-top:-0.5rem;">
+          Comparing the original registered ledger template scan to the live camera crop.
+        </p>
+
+        <div class="delta-grid">
+          <!-- Ingested Reference -->
+          <div>
+            <label style="font-size:0.7rem; color:var(--color-gold);">1. Ingested Reference</label>
+            <div class="delta-view" style="margin-top:0.25rem;">
+              <span class="delta-label">Ledger</span>
+              <div style="font-family:'Playfair Display', serif; font-style:italic; font-size:1rem; color:#1a237e; text-align:center; padding:1.25rem 0;" id="delta-orig-text">
+                1.20 Hectares
+              </div>
+            </div>
+          </div>
+
+          <!-- Live Scan -->
+          <div>
+            <label style="font-size:0.7rem; color:var(--color-crimson);">2. Live Camera View</label>
+            <div class="delta-view" style="margin-top:0.25rem;">
+              <span class="delta-label" style="background:var(--color-crimson);">Scanner</span>
+              <div style="font-family:'Playfair Display', serif; font-style:italic; font-size:1rem; color:#b71c1c; font-weight:800; text-align:center; padding:1.25rem 0;" id="delta-live-text">
+                7.20 Hectares
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card glass-panel" style="padding:1rem; gap:0.5rem; background: rgba(195, 15, 48, 0.05); border-color: rgba(195, 15, 48, 0.3);">
+          <div style="font-weight:700; font-size:0.8rem; color:var(--color-crimson);">Discrepancy Analysis:</div>
+          <p style="font-size:0.75rem; line-height:1.4; color:var(--color-text-primary);">
+            The handwritten digit <strong>'1'</strong> has been physically altered to resemble digit <strong>'7'</strong> by adding an illegal upper horizontal bar. 
+            This represents an unauthorized allocation claim of <strong>+6.00 Hectares</strong> of village common land.
+          </p>
+        </div>
+
+        <div class="blueprint-note" style="border-color:var(--color-crimson);">
+          <strong>OCR Vector Mapping:</strong>
+          <p style="font-size:0.7rem; color:var(--color-text-secondary); margin-top:0.25rem;">
+            Pixel matrix deviation value: 16.48. Fraud flag raised inside Land record compartment 04.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- Incident Logging Drawer -->
+    <div class="drawer" id="report-drawer">
+      <div class="drawer-header">
+        <span class="drawer-title text-crimson">Report Forgery Incident</span>
+        <button class="drawer-close" id="btn-close-report">&times;</button>
+      </div>
+      <div class="drawer-body">
+        <p style="font-size:0.85rem; color:var(--color-text-secondary); margin-top:-0.5rem;">
+          Register this land deed forgery case directly into the district registry logs.
+        </p>
+
+        <form id="incident-form" style="display:flex; flex-direction:column; gap:1.25rem;">
+          <div class="form-group">
+            <label>Reporting Officer ID (BDO ID)</label>
+            <input type="text" id="reporter-id" required value="BDO-SECTOR-07 / TEHSILDAR" readonly>
+          </div>
+
+          <div class="form-group">
+            <label>Incident Severity</label>
+            <select id="report-severity">
+              <option value="CRITICAL">Critical - Land Deed Forgery Attempt</option>
+              <option value="MODERATE">Moderate - Unclear Ink / Calibration</option>
+              <option value="LOW">Low - Calibration Error Only</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Incident Description</label>
+            <textarea id="report-details" rows="5" required style="resize:none;">Allotted land area for Rajesh Kumar has been physically tampered. The digit '1.20 Hectares' was forged to '7.20 Hectares' using dark blue ink overwrite. Cryptographic seal check failed.</textarea>
+          </div>
+
+          <button type="submit" class="btn btn-danger" style="padding:1rem;">Submit Forgery Report</button>
+        </form>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const state = getSystemState();
+      
+      const termId = "result-terminal";
+      writeToTerminal(termId, "Deed registry database ledger queried successfully.", "info");
+
+      const docTitle = document.getElementById("doc-title-placeholder");
+      const docMeta = document.getElementById("doc-meta-placeholder");
+      const handwriting = document.getElementById("handwriting-placeholder");
+      const signature = document.getElementById("signature-placeholder");
+      const qrPlaceholder = document.getElementById("qr-placeholder");
+
+      const panelVerified = document.getElementById("panel-verified");
+      const panelTampered = document.getElementById("panel-tampered");
+      const arHighlightBox = document.getElementById("ar-highlight-box");
+      const arTagLabel = document.getElementById("ar-tag-label");
+      const arTagVerified = document.getElementById("ar-tag-verified");
+      const cropBrackets = document.getElementById("crop-brackets");
+      
+      const deltaDrawer = document.getElementById("delta-drawer");
+      const reportDrawer = document.getElementById("report-drawer");
+      
+      const docHash = state.hashGenerated || "e47ac5f6d63428d09ca081df32c918bb619ca24838634120ec2c2f6d45bbdc9a";
+      document.getElementById("lbl-verified-hash").textContent = docHash.substring(0, 24) + "...";
+      document.getElementById("lbl-verified-time").textContent = new Date().toLocaleString();
+
+      docTitle.textContent = state.docTitle;
+      docMeta.innerHTML = `${state.docId}<br>${state.docDate}`;
+      signature.innerHTML = SVG_TEMPLATES.signature;
+      qrPlaceholder.innerHTML = SVG_TEMPLATES.qrCode(docHash);
+
+      const activeDocType = state.inspectorDocType || "clean";
+
+      if (activeDocType === "clean") {
+        handwriting.innerHTML = state.docOriginalText;
+        handwriting.className = "doc-handwriting";
+        
+        panelVerified.style.display = "flex";
+        panelTampered.style.display = "none";
+        
+        arTagVerified.style.display = "flex";
+        arHighlightBox.style.display = "none";
+        
+        cropBrackets.className = "scanner-crop-corners"; 
+        
+        document.getElementById("anchor-1").style.display = "block";
+        document.getElementById("anchor-2").style.display = "block";
+        document.getElementById("anchor-3").style.display = "block";
+        document.getElementById("anchor-4").style.display = "block";
+        
+        writeToTerminal(termId, "OpenCV Match: 100% pixel density match found.", "success");
+        writeToTerminal(termId, "Verification successful. Deed is original and untampered.", "success");
+      } else {
+        handwriting.innerHTML = state.docTamperedText;
+        handwriting.className = "doc-handwriting doc-tampered-text";
+        
+        panelVerified.style.display = "none";
+        panelTampered.style.display = "flex";
+        
+        arHighlightBox.style.display = "block";
+        arTagLabel.style.display = "flex";
+        arTagVerified.style.display = "none";
+        
+        cropBrackets.className = "scanner-crop-corners tampered";
+        
+        writeToTerminal(termId, "OpenCV Matrix: pixel mismatch detected in bounding segment [X:45, Y:140].", "error");
+        writeToTerminal(termId, "Cryptographic verification failed! ALERT: Unauthorized alterations found.", "error");
+      }
+
+      document.getElementById("btn-show-delta").addEventListener("click", () => {
+        deltaDrawer.classList.add("open");
+        writeToTerminal(termId, "Opening Pixel Delta side panel.", "info");
+      });
+      document.getElementById("btn-close-delta").addEventListener("click", () => {
+        deltaDrawer.classList.remove("open");
+      });
+
+      document.getElementById("btn-report-incident").addEventListener("click", () => {
+        reportDrawer.classList.add("open");
+        writeToTerminal(termId, "Opening Forgery Incident Report form drawer.", "info");
+      });
+      document.getElementById("btn-close-report").addEventListener("click", () => {
+        reportDrawer.classList.remove("open");
+      });
+
+      document.getElementById("incident-form").addEventListener("submit", (e) => {
+        e.preventDefault();
+        const severity = document.getElementById("report-severity").value;
+        alert(`Incident report successfully logged. Priority: [${severity}]. Transaction record updated.`);
+        reportDrawer.classList.remove("open");
+        writeToTerminal(termId, `Incident submitted successfully. Log ID: INC-${Math.floor(Math.random()*9000)+1000}.`, "success");
+      });
+    });
+  </script>
+</body>
+</html>

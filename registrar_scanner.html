@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat SmartPaper AR Audit Trail - Ingestion Scanner</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-logo">GP</div>
+      <div class="brand-text">Panchayat <span>SmartPaper AR</span></div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Panchayat Portal</a>
+      <a href="registrar_scanner.html" class="nav-link active">Security Ingestion Flow</a>
+      <a href="inspector_hud.html" class="nav-link">AR Audit Flow</a>
+    </nav>
+  </header>
+
+  <main>
+    <!-- Step Progression Tracker -->
+    <div class="step-indicator">
+      <div class="step-bubble active">1</div>
+      <div style="font-size:0.85rem; font-weight:600; color:var(--color-gold);">Document Alignment</div>
+      <div class="step-connector"></div>
+      
+      <div class="step-bubble">2</div>
+      <div style="font-size:0.85rem; font-weight:500; color:var(--color-text-secondary);">Feature Extraction</div>
+      <div class="step-connector"></div>
+      
+      <div class="step-bubble">3</div>
+      <div style="font-size:0.85rem; font-weight:500; color:var(--color-text-secondary);">Security Sticker</div>
+    </div>
+
+    <div class="grid-2">
+      <!-- Camera Viewport Mockup -->
+      <div class="card glass-panel" style="padding: 1rem;">
+        <div class="card-title" style="justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="status-dot active"></span> 
+            <span>CAMERA FEED: CSC_SECTOR_04</span>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color:var(--color-text-secondary);">1080P // AUTO_ALIGN</span>
+        </div>
+
+        <div class="viewport-container" id="camera-viewport">
+          <div class="scanner-laser" id="laser"></div>
+          <div class="scanner-grid active" id="scanner-grid"></div>
+          
+          <div class="scanner-crop-corners" id="crop-corners">
+            <div class="scanner-crop-corners-inner"></div>
+          </div>
+
+          <div class="alignment-overlay" id="alignment-overlay">
+            <div class="alignment-crosshair"></div>
+          </div>
+
+          <div class="viewport-overlay">
+            <div class="viewport-hud">
+              <div class="viewport-hud-item">
+                <span>ZOOM: 1.0X</span>
+              </div>
+              <div class="viewport-hud-item" id="stabilizer-hud">
+                <span class="status-dot active"></span>
+                <span>STABILIZER: OK</span>
+              </div>
+            </div>
+            
+            <div style="color:#ffffff; text-shadow:0 2px 4px rgba(0,0,0,0.8); text-align:center; font-family:'JetBrains Mono', monospace; font-size:0.7rem; padding-bottom:1rem;" id="hud-directions">
+              [ALIGN PAPER DEED INSIDE CORNERS]
+            </div>
+          </div>
+
+          <!-- Non-Judicial Indian Stamp Paper mockup inside viewport -->
+          <div class="document-mockup stamp-paper" id="paper-doc">
+            <div class="stamp-header-band">भारत गैर न्यायिक // INDIAN NON JUDICIAL</div>
+            <div class="stamp-crest">GOVT. OF UTTAR PRADESH</div>
+            <div class="doc-watermark">LAND DEED</div>
+            <div class="doc-header" style="border-bottom: 1px solid #8d6e63; padding-bottom:0.25rem;">
+              <span class="doc-title" id="doc-title-placeholder" style="font-size:0.6rem; font-weight:800; color:#3e2723;">LAND MUTATION REGISTER</span>
+              <span class="doc-meta" id="doc-meta-placeholder" style="font-size:0.5rem; color:#5d4037;">GP-KHATA-88092-B<br>2026-08-28</span>
+            </div>
+            <div class="doc-body" style="gap:0.4rem; margin-top:0.4rem;">
+              <div class="doc-line medium" style="background:#d7ccc8;"></div>
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+              <div class="doc-line short" style="background:#d7ccc8;"></div>
+              
+              <div class="doc-handwriting" id="handwriting-placeholder" style="font-size:0.75rem; color:#1a237e; border-color:#8d6e63; padding: 0.15rem 0;">
+                Allotted Area: 1.20 Hectares to Rajesh Kumar
+              </div>
+              
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+            </div>
+            <div class="doc-footer" style="border-top:1px solid #d7ccc8; padding-top:0.25rem;">
+              <div class="doc-signature" id="signature-placeholder"></div>
+              <div class="doc-qr-placeholder" id="qr-placeholder" style="border-color:#a1887f;">
+                SECURITY<br>SEAL
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Action Panel & Spec Notes -->
+      <div class="card glass-panel" style="justify-content: space-between;">
+        <div>
+          <div class="card-title">
+            <span class="text-teal">📷</span> 
+            <span>Deed Registration Scanner</span>
+          </div>
+          <p style="color:var(--color-text-secondary); font-size:0.88rem; margin-top:-0.5rem; margin-bottom: 1.5rem;">
+            Align the land deed registry copy inside the screen borders. 
+            The system will scan the borders, crop, and normalize the paper perspective automatically.
+          </p>
+
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            <div class="metadata-list">
+              <div class="metadata-item">
+                <span class="metadata-label">Detected Format</span>
+                <span class="metadata-value" id="model-val" style="color:var(--color-gold);">Non-Judicial Stamp Paper</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-label">Anchors Locked</span>
+                <span class="metadata-value" id="anchors-val" style="color:var(--color-gold);">Ready (4/4 Locked)</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-label">Alignment Score</span>
+                <span class="metadata-value" id="align-val" style="color:var(--color-gold);">98.4% (Perfect)</span>
+              </div>
+            </div>
+
+            <button id="btn-capture" class="btn btn-primary" style="padding: 1rem; width:100%; font-size:1.05rem;">
+              Capture & Analyze Deed
+            </button>
+          </div>
+          
+          <div style="margin-top: 1.5rem;">
+            <div class="blueprint-note">
+              <strong>Deed Verification Spec:</strong>
+              <p style="font-size:0.75rem; margin-top:0.25rem; line-height:1.4;">
+                Corner trackers anchor to standard 10 Rupee / 100 Rupee government stamp paper boundaries, allowing real-time angle adjustments on basic tablet camera hardware.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-container">
+          <div class="console-title">🖥️ Optical Scanner Console</div>
+          <div id="scan-terminal" class="hash-terminal"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const state = getSystemState();
+      
+      document.getElementById("doc-title-placeholder").textContent = state.docTitle;
+      document.getElementById("doc-meta-placeholder").innerHTML = `${state.docId}<br>${state.docDate}`;
+      document.getElementById("handwriting-placeholder").textContent = state.docOriginalText;
+      document.getElementById("signature-placeholder").innerHTML = SVG_TEMPLATES.signature;
+      
+      const termId = "scan-terminal";
+      writeToTerminal(termId, "Scanner software initialized. Camera feed online.", "info");
+      writeToTerminal(termId, "Border alignment 98% perfect. Government stamp paper detected.", "success");
+
+      const captureBtn = document.getElementById("btn-capture");
+      const laser = document.getElementById("laser");
+      const alignmentOverlay = document.getElementById("alignment-overlay");
+      const hudDirections = document.getElementById("hud-directions");
+
+      captureBtn.addEventListener("click", () => {
+        captureBtn.disabled = true;
+        
+        laser.style.display = "block";
+        alignmentOverlay.style.borderStyle = "solid";
+        alignmentOverlay.style.borderColor = "var(--color-gold)";
+        alignmentOverlay.style.boxShadow = "var(--shadow-gold)";
+        
+        hudDirections.textContent = "[PROCESSING DEED CAPTURE AND OCR EXTRAC...]";
+        hudDirections.style.color = "var(--color-gold)";
+        
+        writeToTerminal(termId, "Camera shutter activated. Capturing high-res image...", "info");
+        writeToTerminal(termId, "Border detector: Tracking stamp edges...", "info");
+        
+        setTimeout(() => {
+          writeToTerminal(termId, "Applying perspective correction. Angle matrices calculated. [TL:0.12, TR:0.88]", "info");
+          writeToTerminal(termId, "Binarization threshold filter applied.", "info");
+        }, 800);
+
+        setTimeout(() => {
+          writeToTerminal(termId, "Alignment correction successful. Image saved to cash memory.", "success");
+          writeToTerminal(termId, "Computer Vision: Handwriting block grid mapped.", "info");
+          
+          updateSystemState({ scanCompleted: true });
+        }, 1600);
+
+        setTimeout(() => {
+          writeToTerminal(termId, "Passing file buffer to OpenCV feature extraction...", "success");
+          
+          setTimeout(() => {
+            window.location.href = "registrar_hash.html";
+          }, 500);
+        }, 2400);
+      });
+    });
+  </script>
+</body>
+</html>

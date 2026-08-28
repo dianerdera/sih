@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Panchayat SmartPaper AR Audit Trail - BDO Verification HUD</title>
+  <link rel="stylesheet" href="style.css">
+  <style>
+    /* Custom AR HUD Reticle */
+    .ar-reticle {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 140px;
+      height: 140px;
+      pointer-events: none;
+      z-index: 15;
+    }
+    
+    .ar-reticle-bracket {
+      position: absolute;
+      width: 25px;
+      height: 25px;
+      border-color: var(--color-gold);
+      border-style: solid;
+      transition: all 0.3s ease;
+    }
+    
+    .reticle-tl { top: 0; left: 0; border-width: 3px 0 0 3px; }
+    .reticle-tr { top: 0; right: 0; border-width: 3px 3px 0 0; }
+    .reticle-bl { bottom: 0; left: 0; border-width: 0 0 3px 3px; }
+    .reticle-br { bottom: 0; right: 0; border-width: 0 3px 3px 0; }
+
+    .ar-reticle.scanning {
+      animation: rotate-reticle 4s linear infinite;
+    }
+    
+    .ar-reticle.scanning .ar-reticle-bracket {
+      border-color: var(--color-gold);
+      box-shadow: 0 0 10px var(--color-gold-glow);
+    }
+    
+    @keyframes rotate-reticle {
+      0% { transform: translate(-50%, -50%) rotate(0deg); width: 140px; height: 140px; }
+      50% { width: 120px; height: 120px; }
+      100% { transform: translate(-50%, -50%) rotate(360deg); width: 140px; height: 140px; }
+    }
+
+    .selector-box {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-md);
+      padding: 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      background: var(--color-surface-deep);
+    }
+    
+    .selector-option {
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      padding: 0.75rem 1rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--color-surface);
+    }
+    
+    .selector-option:hover {
+      border-color: var(--color-text-dim);
+    }
+    
+    .selector-option.active {
+      border-color: var(--color-gold);
+      background: rgba(212, 163, 115, 0.05);
+    }
+    
+    .selector-option.active.tamper-style {
+      border-color: var(--color-crimson);
+      background: rgba(195, 15, 48, 0.05);
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <a href="index.html" class="brand">
+      <div class="brand-logo">GP</div>
+      <div class="brand-text">Panchayat <span>SmartPaper AR</span></div>
+    </a>
+    <nav class="nav-links">
+      <a href="index.html" class="nav-link">Panchayat Portal</a>
+      <a href="registrar_scanner.html" class="nav-link">Security Ingestion Flow</a>
+      <a href="inspector_hud.html" class="nav-link active">AR Audit Flow</a>
+    </nav>
+  </header>
+
+  <main>
+    <div class="grid-2">
+      <!-- AR Camera Stream -->
+      <div class="card glass-panel" style="padding: 1rem;">
+        <div class="card-title" style="justify-content: space-between;">
+          <div style="display:flex; align-items:center; gap:0.5rem;">
+            <span class="status-dot danger" id="cam-led"></span> 
+            <span>AR INSPECTOR VIEWPORT</span>
+          </div>
+          <span style="font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color:var(--color-text-secondary);">60 FPS // SPATIAL LOCK</span>
+        </div>
+
+        <div class="viewport-container" id="inspector-viewport" style="background:#0c0908;">
+          
+          <!-- AR Reticle -->
+          <div class="ar-reticle" id="reticle">
+            <div class="ar-reticle-bracket reticle-tl"></div>
+            <div class="ar-reticle-bracket reticle-tr"></div>
+            <div class="ar-reticle-bracket reticle-bl"></div>
+            <div class="ar-reticle-bracket reticle-br"></div>
+          </div>
+
+          <div class="scanner-grid active" id="inspector-grid" style="opacity: 0.3;"></div>
+          
+          <div class="viewport-overlay" style="z-index:20;">
+            <div class="viewport-hud">
+              <div class="viewport-hud-item">
+                <span>GYRO ACCURACY: HIGH</span>
+              </div>
+              <div class="viewport-hud-item">
+                <span>QR STATUS: <span id="hud-qr-track" style="color:var(--color-gold);">SEARCHING</span></span>
+              </div>
+            </div>
+
+            <div style="color:#ffffff; text-shadow:0 2px 4px rgba(0,0,0,0.8); text-align:center; font-family:'JetBrains Mono', monospace; font-size:0.7rem; padding-bottom:1rem;" id="hud-directions">
+              [ALIGN RETICLE WITH MICRO-QR STICKER]
+            </div>
+          </div>
+
+          <!-- Non-Judicial Indian Stamp Paper mockup inside camera -->
+          <div class="document-mockup stamp-paper" style="transform: translate(-50%, -50%) scale(0.95);" id="paper-doc">
+            <div class="stamp-header-band" style="margin-bottom:0.25rem;">भारत गैर न्यायिक // INDIAN NON JUDICIAL</div>
+            <div class="stamp-crest" style="font-size:1rem; margin-bottom:0.4rem;">GOVT. OF UTTAR PRADESH</div>
+            <div class="doc-watermark">LAND DEED</div>
+            <div class="doc-header" style="border-bottom: 1px solid #8d6e63; padding-bottom:0.25rem;">
+              <span class="doc-title" id="doc-title-placeholder" style="font-size:0.6rem; color:#3e2723;">LAND MUTATION REGISTER</span>
+              <span class="doc-meta" id="doc-meta-placeholder" style="font-size:0.5rem; color:#5d4037;">GP-KHATA-88092-B<br>2026-08-28</span>
+            </div>
+            <div class="doc-body" style="gap:0.4rem; margin-top:0.4rem;">
+              <div class="doc-line medium" style="background:#d7ccc8;"></div>
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+              
+              <!-- Handwriting amount block -->
+              <div class="doc-handwriting" id="handwriting-placeholder" style="font-size:0.75rem; color:#1a237e;">
+                Allotted Area: 1.20 Hectares to Rajesh Kumar
+              </div>
+              
+              <div class="doc-line" style="background:#d7ccc8;"></div>
+            </div>
+            <div class="doc-footer" style="border-top:1px solid #d7ccc8; padding-top:0.25rem;">
+              <div class="doc-signature" id="signature-placeholder"></div>
+              <div class="doc-qr-placeholder attached" id="qr-placeholder"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Control center panel -->
+      <div class="card glass-panel" style="justify-content: space-between;">
+        <div>
+          <div class="card-title">
+            <span class="text-teal">🕶️</span> 
+            <span>AR Inspector HUD Controls</span>
+          </div>
+          <p style="color:var(--color-text-secondary); font-size:0.88rem; margin-top:-0.5rem; margin-bottom: 1.25rem;">
+            Select whether you are scanning the clean authentic stamp copy or a tampered version. 
+            The AR core will automatically decrypt the sticker hash and check spatial ink dimensions.
+          </p>
+
+          <div style="display:flex; flex-direction:column; gap:1.25rem;">
+            
+            <!-- Selector Box -->
+            <div class="selector-box">
+              <label>Select Test Document State</label>
+              
+              <div class="selector-option active" id="opt-clean">
+                <div>
+                  <div style="font-weight:600; font-size:0.85rem; font-family:'Playfair Display', serif;">1. Authentic Land Record</div>
+                  <div style="font-size:0.75rem; color:var(--color-text-secondary);">Area: 1.20 Hectares. Allotted to Rajesh Kumar.</div>
+                </div>
+                <span class="badge badge-teal">Clean Deed</span>
+              </div>
+              
+              <div class="selector-option" id="opt-tampered">
+                <div>
+                  <div style="font-weight:600; font-size:0.85rem; font-family:'Playfair Display', serif;">2. Tampered Document State</div>
+                  <div style="font-size:0.75rem; color:var(--color-text-secondary);">Handwriting altered from 1.20 Hectares to 7.20 Hectares.</div>
+                </div>
+                <span class="badge badge-crimson">Tampered</span>
+              </div>
+            </div>
+
+            <div class="metadata-list">
+              <div class="metadata-item">
+                <span class="metadata-label">Decoded QR Hash</span>
+                <span class="metadata-value" id="qr-hash-preview" style="text-overflow:ellipsis; overflow:hidden; white-space:nowrap; max-width:200px;">e47ac5f6d63428d09ca0...</span>
+              </div>
+              <div class="metadata-item">
+                <span class="metadata-label">AR Spatial Lock</span>
+                <span class="metadata-value" id="ref-status-val" style="color:var(--color-gold);">Awaiting target lock</span>
+              </div>
+            </div>
+
+            <button id="btn-scan" class="btn btn-primary" style="padding: 1rem; width:100%; font-size:1.05rem;" disabled>
+              Initiate Verification Sweep
+            </button>
+          </div>
+          
+          <div style="margin-top: 1.25rem;">
+            <div class="blueprint-note">
+              <strong>Lal Dora Overlay Guideline:</strong>
+              <p style="font-size:0.75rem; margin-top:0.25rem; line-height:1.4;">
+                Once the Sarkari Suraksha sticker is spatially locked, BDO HUD aligns a grid layout to identify handwriting coordinate offsets.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div class="console-container">
+          <div class="console-title">🖥️ Mobile AR HUD Console</div>
+          <div id="inspector-terminal" class="hash-terminal"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="app.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const state = getSystemState();
+      
+      const termId = "inspector-terminal";
+      writeToTerminal(termId, "BDO HUD Mode initialized successfully.", "info");
+      writeToTerminal(termId, "Lenses calibrated. Searching for stamp anchors...", "info");
+
+      const docTitle = document.getElementById("doc-title-placeholder");
+      const docMeta = document.getElementById("doc-meta-placeholder");
+      const handwriting = document.getElementById("handwriting-placeholder");
+      const signature = document.getElementById("signature-placeholder");
+      const qrPlaceholder = document.getElementById("qr-placeholder");
+      
+      const optClean = document.getElementById("opt-clean");
+      const optTampered = document.getElementById("opt-tampered");
+      const scanBtn = document.getElementById("btn-scan");
+      
+      const hashVal = state.hashGenerated || "e47ac5f6d63428d09ca081df32c918bb619ca24838634120ec2c2f6d45bbdc9a";
+      document.getElementById("qr-hash-preview").textContent = hashVal.substring(0, 20) + "...";
+
+      docTitle.textContent = state.docTitle;
+      docMeta.innerHTML = `${state.docId}<br>${state.docDate}`;
+      signature.innerHTML = SVG_TEMPLATES.signature;
+      qrPlaceholder.innerHTML = SVG_TEMPLATES.qrCode(hashVal);
+
+      let activeDocType = state.inspectorDocType || "clean";
+      
+      function setDocVisuals(type) {
+        activeDocType = type;
+        updateSystemState({ inspectorDocType: type });
+        
+        if (type === "clean") {
+          handwriting.innerHTML = state.docOriginalText;
+          handwriting.className = "doc-handwriting";
+          optClean.classList.add("active");
+          optClean.classList.remove("tamper-style");
+          optTampered.classList.remove("active", "tamper-style");
+          writeToTerminal(termId, "Camera focus: Original Clean land record copy mounted.", "warning");
+        } else {
+          handwriting.innerHTML = state.docTamperedText + `<span class="doc-tampered-text"></span>`;
+          handwriting.className = "doc-handwriting doc-tampered-text";
+          optTampered.classList.add("active", "tamper-style");
+          optClean.classList.remove("active");
+          writeToTerminal(termId, "Camera focus: Modified land mutation copy mounted.", "warning");
+        }
+      }
+
+      setDocVisuals(activeDocType);
+
+      optClean.addEventListener("click", () => setDocVisuals("clean"));
+      optTampered.addEventListener("click", () => setDocVisuals("tampered"));
+
+      // Target lock animation
+      setTimeout(() => {
+        const qrTrack = document.getElementById("hud-qr-track");
+        const camLed = document.getElementById("cam-led");
+        const refStatus = document.getElementById("ref-status-val");
+        
+        qrTrack.textContent = "LOCKED";
+        qrTrack.style.color = "var(--color-green)";
+        camLed.className = "status-dot active";
+        refStatus.textContent = "Anchors locked (X:430, Y:120)";
+        refStatus.style.color = "var(--color-green)";
+        
+        scanBtn.disabled = false;
+        
+        writeToTerminal(termId, "Security sticker detected. Central ledger data synchronized.", "success");
+        writeToTerminal(termId, "Spatial lock established relative to sticker boundaries.", "success");
+      }, 1500);
+
+      scanBtn.addEventListener("click", () => {
+        scanBtn.disabled = true;
+        optClean.style.pointerEvents = "none";
+        optTampered.style.pointerEvents = "none";
+        
+        const reticle = document.getElementById("reticle");
+        reticle.classList.add("scanning");
+        
+        const hudDirections = document.getElementById("hud-directions");
+        hudDirections.textContent = "[CHECKING HANDWRITING INK DENSITY...]";
+        hudDirections.style.color = "var(--color-gold)";
+        
+        writeToTerminal(termId, "Initiating spatial matrix comparison...", "info");
+        writeToTerminal(termId, "Fetching registrar hash values...", "info");
+        
+        setTimeout(() => {
+          writeToTerminal(termId, "Verifying mutation transaction GP-KHATA-88092-B...", "info");
+        }, 600);
+
+        setTimeout(() => {
+          writeToTerminal(termId, `Ledger Hash signature: ${hashVal.substring(0, 16)}...`, "info");
+          writeToTerminal(termId, "OpenCV Matrix: comparing camera frame shapes with ledger parameters...", "warning");
+        }, 1200);
+
+        setTimeout(() => {
+          writeToTerminal(termId, "Analysis completed. Mounting result data structures...", "success");
+          
+          setTimeout(() => {
+            window.location.href = `inspector_result.html`;
+          }, 400);
+        }, 1800);
+      });
+    });
+  </script>
+</body>
+</html>
